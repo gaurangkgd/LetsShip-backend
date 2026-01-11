@@ -1,0 +1,360 @@
+{
+  "info": {
+    "name": "Let's Shyp Backend API",
+    "description": "Complete API collection for the delivery management system with order creation, courier assignment, and lifecycle tracking.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order (Express - Within Range)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickupLocation\": {\"x\": 10, \"y\": 10},\n  \"dropLocation\": {\"x\": 20, \"y\": 20},\n  \"deliveryType\": \"Express\",\n  \"packageDetails\": \"Small parcel, 2kg\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders"]
+            },
+            "description": "Creates an Express order within 15 units of available couriers. Should auto-assign nearest courier."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Order (Express - Out of Range)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickupLocation\": {\"x\": 500, \"y\": 500},\n  \"dropLocation\": {\"x\": 510, \"y\": 510},\n  \"deliveryType\": \"Express\",\n  \"packageDetails\": \"Document envelope\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders"]
+            },
+            "description": "Creates an Express order far from all couriers (>15 units). Should remain unassigned."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Order (Normal Delivery)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickupLocation\": {\"x\": 50, \"y\": 50},\n  \"dropLocation\": {\"x\": 75, \"y\": 75},\n  \"deliveryType\": \"Normal\",\n  \"packageDetails\": \"Large box, 10kg\",\n  \"vehicleDetails\": \"Requires van\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders"]
+            },
+            "description": "Creates a Normal delivery order. Should assign nearest available courier regardless of distance."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/orders",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders"]
+            },
+            "description": "Retrieves all orders in the system."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/orders/:orderId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", ":orderId"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "",
+                  "description": "UUID of the order"
+                }
+              ]
+            },
+            "description": "Retrieves a specific order by its ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order State (PICKED_UP)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"PICKED_UP\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/:orderId/state",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", ":orderId", "state"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "",
+                  "description": "UUID of the order"
+                }
+              ]
+            },
+            "description": "Transitions order from ASSIGNED to PICKED_UP state."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order State (IN_TRANSIT)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"IN_TRANSIT\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/:orderId/state",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", ":orderId", "state"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "",
+                  "description": "UUID of the order"
+                }
+              ]
+            },
+            "description": "Transitions order from PICKED_UP to IN_TRANSIT state."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order State (DELIVERED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"DELIVERED\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/:orderId/state",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", ":orderId", "state"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "",
+                  "description": "UUID of the order"
+                }
+              ]
+            },
+            "description": "Transitions order to DELIVERED (terminal state). Releases assigned courier."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Order State (CANCELLED)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"state\": \"CANCELLED\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/orders/:orderId/state",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "orders", ":orderId", "state"],
+              "variable": [
+                {
+                  "key": "orderId",
+                  "value": "",
+                  "description": "UUID of the order"
+                }
+              ]
+            },
+            "description": "Cancels order (can be done from any state). Releases assigned courier."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Couriers",
+      "item": [
+        {
+          "name": "Get All Couriers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/couriers",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "couriers"]
+            },
+            "description": "Retrieves all couriers with their availability status and current locations."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Courier by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/couriers/:courierId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "couriers", ":courierId"],
+              "variable": [
+                {
+                  "key": "courierId",
+                  "value": "courier-1",
+                  "description": "ID of the courier (e.g., courier-1)"
+                }
+              ]
+            },
+            "description": "Retrieves a specific courier by their ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Courier Location",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": {\"x\": 25, \"y\": 30}\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/couriers/:courierId/location",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "couriers", ":courierId", "location"],
+              "variable": [
+                {
+                  "key": "courierId",
+                  "value": "courier-1",
+                  "description": "ID of the courier"
+                }
+              ]
+            },
+            "description": "Updates a courier's current location coordinates."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": [""]
+            },
+            "description": "Health check endpoint to verify server is running."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

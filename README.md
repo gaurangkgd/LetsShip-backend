@@ -3,6 +3,17 @@
 ## Overview
 This is a REST API backend for a delivery management system that handles order creation, courier assignment, and order lifecycle tracking. The system automatically assigns the nearest available courier to incoming orders based on delivery type constraints.
 
+## Assignment Explanation
+
+**System Design Approach:**
+Domain-driven architecture with clear separation: Models define entities, Services contain business logic (order lifecycle, courier assignment), Controllers handle HTTP, and Middleware manages cross-cutting concerns. Manhattan distance algorithm powers proximity-based auto-assignment with Express delivery 15-unit constraint.
+
+**Concurrency Handling:**
+Set-based assignment lock prevents race conditions during courier allocation. When multiple orders are created simultaneously, the lock ensures each courier is assigned to only one order. Lock timeout (100ms) prevents deadlock while simulating atomic operations in the single-threaded Node.js environment.
+
+**Production Scalability Improvement:**
+Replace in-memory Maps with Redis for distributed state management. Implement pub/sub for real-time courier updates. Add database connection pooling (PostgreSQL) for persistent storage. Deploy lock mechanism using Redis distributed locks (Redlock algorithm) to handle concurrent requests across multiple server instances in a load-balanced environment.
+
 ## Design Overview
 
 The system implements a **domain-driven architecture** with clear separation of concerns:
@@ -95,6 +106,12 @@ npm start
 ```
 
 Server runs on `http://localhost:3000`
+
+## API Documentation
+
+You can test the API using:
+1. **README Examples**: curl commands provided below
+2. **Postman Collection**: Import `LetsShyp.postman_collection.json` into Postman for complete API testing
 
 ## Running Tests
 
