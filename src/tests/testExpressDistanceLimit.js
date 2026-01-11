@@ -107,6 +107,8 @@ console.log('\n');
 // Test 4: Express order at edge of distance limit (x:15 away)
 console.log('🧪 Test 4: Express order at EDGE of distance limit (15 units away)');
 try {
+  // Reinitialize database to ensure a fresh available courier for edge test
+  initializeDatabase();
   // Find a courier and create order exactly 15 units away
   const testCourier = Array.from(couriers.values())[0];
   const result = createOrder({

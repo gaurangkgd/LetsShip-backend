@@ -17,11 +17,17 @@ The system implements a **domain-driven architecture** with clear separation of 
 
 5. **Distance Calculation**: Manhattan distance (|Δx| + |Δy|) is used for proximity matching, providing a simple grid-based metric suitable for urban delivery routing.
 
-6. **Error Handling**: Three-layer approach: validation layer (input checks), service layer (business logic errors), and global error handler (unexpected exceptions). All errors return structured JSON responses.
+6. **Input Sanitization**: Delivery types are normalized (case-insensitive), strings are trimmed, and coordinates are range-validated to prevent invalid data from entering the system.
 
-7. **Middleware Pipeline**: Request logger → JSON parser → Route handlers → 404 handler → Error handler. Logs include timestamps for debugging and audit trails.
+7. **Standardized API Responses**: All endpoints return a consistent JSON envelope with `success` boolean, `data` object (on success), `error` message (on failure), and optional `message` field for additional context.
 
-8. **RESTful Design**: Standard HTTP verbs (GET/POST/PATCH) with resource-based URLs. POST creates resources, PATCH updates state, GET retrieves data.
+8. **Error Handling**: Three-layer approach: validation layer (input checks), service layer (business logic errors), and global error handler (unexpected exceptions). All errors return structured JSON responses.
+
+9. **Middleware Pipeline**: Request logger → JSON parser → Route handlers → 404 handler → Error handler. Logs include timestamps for debugging and audit trails.
+
+10. **RESTful Design**: Standard HTTP verbs (GET/POST/PATCH) with resource-based URLs. POST creates resources, PATCH updates state, GET retrieves data.
+
+11. **Simulation Service**: Optional courier movement simulation that automatically advances order states and moves couriers toward destinations, useful for demos and testing.
 
 ## Tech Stack
 - **Runtime**: Node.js
@@ -52,10 +58,14 @@ src/
 ├── utils/
 │   ├── database.js          # In-memory data store initialization
 │   ├── distance.js          # Manhattan distance calculator
-│   └── validators.js        # Input validation functions
-└── tests/
-    ├── testExpressDistanceLimit.js  # Express delivery constraint tests
-    └── testConcurrency.js           # Assignment lock verification tests
+│   └── validators.js        # Input validation & sanitization functions
+├── services/
+│   └── simulationService.js # Courier movement & order progression simulation
+├── tests/
+│   ├── testExpressDistanceLimit.js  # Express delivery constraint tests
+│   └── testConcurrency.js           # Assignment lock verification tests
+└── scripts/
+    └── demoSimulation.js     # Demo script showing simulation in action
 ```
 
 ## API Endpoints
@@ -96,6 +106,7 @@ node src/tests/testExpressDistanceLimit.js
 
 Expected results:
 - ✅ Express orders within 15 units: ASSIGNED
+- ✅ Express orders at exactly 15 units: ASSIGNED (edge case verified)
 - ✅ Express orders beyond 15 units: UNASSIGNED
 - ✅ Normal orders: ALWAYS ASSIGNED (no distance limit)
 
@@ -109,6 +120,18 @@ Expected results:
 - ✅ Sequential assignments work correctly
 - ✅ Concurrent assignments use different couriers
 - ✅ No duplicate courier assignments detected
+
+### Simulation Demo
+Demonstrates courier movement and order state progression:
+```bash
+node src/scripts/demoSimulation.js
+```
+
+Expected behavior:
+- Creates an order and assigns a courier
+- Courier moves toward pickup, then toward drop location
+- Order progresses: ASSIGNED → PICKED_UP → IN_TRANSIT → DELIVERED
+- Console logs show real-time courier position and order state
 
 ## Example Usage
 
@@ -128,17 +151,20 @@ Response:
 ```json
 {
   "success": true,
-  "order": {
-    "id": "uuid",
-    "state": "ASSIGNED",
-    "courierId": "courier-1",
-    ...
+  "data": {
+    "order": {
+      "id": "uuid",
+      "state": "ASSIGNED",
+      "courierId": "courier-1",
+      ...
+    },
+    "courier": {
+      "id": "courier-1",
+      "name": "Courier-1",
+      "location": {"x": 12, "y": 11}
+    }
   },
-  "courier": {
-    "id": "courier-1",
-    "name": "Courier-1",
-    "location": {"x": 12, "y": 11}
-  }
+  "message": "Order created and assigned successfully"
 }
 ```
 
@@ -175,12 +201,16 @@ Valid transitions:
 ## Key Features
 
 ✅ **Auto-Assignment**: Nearest courier automatically assigned on order creation  
-✅ **Distance Constraints**: Express deliveries respect 15-unit limit  
+✅ **Distance Constraints**: Express deliveries respect 15-unit limit (edge-case verified)  
 ✅ **State Machine**: Strict order lifecycle with validation  
 ✅ **Concurrency Safe**: Assignment lock prevents double-booking  
+✅ **Input Sanitization**: Normalized delivery types, trimmed strings, validated coordinates  
+✅ **Standardized Responses**: Consistent JSON envelope across all endpoints  
 ✅ **Error Handling**: Structured error responses with clear messages  
 ✅ **Request Logging**: Timestamped logs for debugging  
+✅ **Simulation Service**: Courier movement and order progression for demos  
 ✅ **RESTful API**: Standard HTTP methods and status codes  
+✅ **Comprehensive Tests**: Distance limits, concurrency, edge cases verified  
 
 ## Limitations & Future Enhancements
 

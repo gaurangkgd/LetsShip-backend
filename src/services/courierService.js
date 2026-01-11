@@ -30,8 +30,10 @@ function findNearestAvailableCourier(pickupLocation, deliveryType) {
   // For Express delivery, filter couriers within EXPRESS_MAX_DISTANCE
   let eligibleCouriers = couriersWithDistance;
   if (deliveryType === 'Express') {
+    // Allow a tiny epsilon to account for potential floating point rounding
+    const EPS = Number.EPSILON * 100; // small tolerance
     eligibleCouriers = couriersWithDistance.filter(
-      (courier) => courier.distance <= EXPRESS_MAX_DISTANCE
+      (courier) => courier.distance <= (EXPRESS_MAX_DISTANCE + EPS)
     );
   }
 
