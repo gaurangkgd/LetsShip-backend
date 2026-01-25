@@ -5,14 +5,23 @@ This is a REST API backend for a delivery management system that handles order c
 
 ## Assignment Explanation
 
-**System Design Approach:**
-Domain-driven architecture with clear separation: Models define entities, Services contain business logic (order lifecycle, courier assignment), Controllers handle HTTP, and Middleware manages cross-cutting concerns. Manhattan distance algorithm powers proximity-based auto-assignment with Express delivery 15-unit constraint.
+**System Design:** 
+- Domain-driven architecture with clear separation of concerns
+- Models define entities, Services handle business logic, Controllers manage HTTP, Middleware handles cross-cutting concerns
+- Manhattan distance algorithm is used for proximity-based auto-assignment
+- Express deliveries are restricted to a 15-unit distance threshold
 
-**Concurrency Handling:**
-Set-based assignment lock prevents race conditions during courier allocation. When multiple orders are created simultaneously, the lock ensures each courier is assigned to only one order. Lock timeout (100ms) prevents deadlock while simulating atomic operations in the single-threaded Node.js environment.
+**Concurrency Handling:** 
+- A Set-based assignment lock with a 100ms timeout prevents race conditions
+- Ensures a courier can be assigned to only one active order
+- Simulates atomic assignment during concurrent order creation in a single-threaded Node.js environment
 
-**Production Scalability Improvement:**
-Replace in-memory Maps with Redis for distributed state management. Implement pub/sub for real-time courier updates. Add database connection pooling (PostgreSQL) for persistent storage. Deploy lock mechanism using Redis distributed locks (Redlock algorithm) to handle concurrent requests across multiple server instances in a load-balanced environment.
+
+**Production Scalability Improvements:**
+- **Distributed State:** Replace in-memory Maps with Redis for multi-instance deployment
+- **Persistence:** PostgreSQL with connection pooling for durable storage
+- **Distributed Locks:** Redlock algorithm (Redis) for atomic courier assignment across load-balanced instances
+- **Real-time Updates:** Pub/sub (Redis) for live courier location tracking
 
 ## Design Overview
 
@@ -250,4 +259,4 @@ Valid transitions:
 ISC
 
 ## Author
-ISTP Development Team
+Gaurang Gade
